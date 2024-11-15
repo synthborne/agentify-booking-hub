@@ -44,11 +44,15 @@ const BookingPage = () => {
         return;
       }
 
+      // Ensure working_hours is properly typed
+      const workingHours = agentDetails.working_hours === 'nine-to-five' ? 'nine-to-five' as const : 'flexible' as const;
+      
       setAgent({
         ...profile,
         ...agentDetails,
+        working_hours: workingHours,
         role: 'agent' as const
-      });
+      } as Agent);
     };
 
     fetchAgent();
