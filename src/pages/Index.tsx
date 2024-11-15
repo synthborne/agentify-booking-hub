@@ -42,10 +42,6 @@ const mockAgents: Agent[] = [
 const Index = () => {
   const [agents] = useState<Agent[]>(mockAgents);
 
-  const handleBookNow = (agentId: string) => {
-    console.log("Booking agent:", agentId);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -66,7 +62,6 @@ const Index = () => {
             <AgentCard
               key={agent.id}
               agent={agent}
-              onBookNow={handleBookNow}
             />
           ))}
         </div>

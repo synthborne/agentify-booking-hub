@@ -22,7 +22,7 @@ const BookingPage = () => {
     }
 
     const fetchAgent = async () => {
-      const { data: profiles, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", agentId)
@@ -44,7 +44,11 @@ const BookingPage = () => {
         return;
       }
 
-      setAgent({ ...profiles, ...agentDetails });
+      setAgent({
+        ...profile,
+        ...agentDetails,
+        role: 'agent' as const
+      });
     };
 
     fetchAgent();

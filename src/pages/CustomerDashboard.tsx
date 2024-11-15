@@ -39,7 +39,8 @@ const CustomerDashboard = () => {
 
       const combinedAgents = profiles.map(profile => ({
         ...profile,
-        ...agentDetails.find(details => details.id === profile.id)
+        ...agentDetails.find(details => details.id === profile.id),
+        role: 'agent' as const
       })) as Agent[];
 
       setAgents(combinedAgents);
@@ -47,11 +48,6 @@ const CustomerDashboard = () => {
 
     fetchAgents();
   }, [session, navigate]);
-
-  const handleBookNow = (agentId: string) => {
-    // Implement booking logic
-    console.log("Booking agent:", agentId);
-  };
 
   if (!session) return null;
 
@@ -70,11 +66,7 @@ const CustomerDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {agents.map((agent) => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              onBookNow={handleBookNow}
-            />
+            <AgentCard key={agent.id} agent={agent} />
           ))}
         </div>
       </main>
