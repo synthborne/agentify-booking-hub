@@ -99,6 +99,7 @@ export type Database = {
           district: string
           full_name: string
           id: string
+          mobile_number: string
           role: string
           state: string
           updated_at: string
@@ -110,6 +111,7 @@ export type Database = {
           district: string
           full_name: string
           id: string
+          mobile_number: string
           role: string
           state: string
           updated_at?: string
@@ -121,6 +123,7 @@ export type Database = {
           district?: string
           full_name?: string
           id?: string
+          mobile_number?: string
           role?: string
           state?: string
           updated_at?: string
