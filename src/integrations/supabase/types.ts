@@ -9,7 +9,125 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      agent_details: {
+        Row: {
+          id: string
+          rating: number | null
+          review_count: number | null
+          service_charge: number
+          working_days: string
+          working_hours: string
+        }
+        Insert: {
+          id: string
+          rating?: number | null
+          review_count?: number | null
+          service_charge: number
+          working_days: string
+          working_hours: string
+        }
+        Update: {
+          id?: string
+          rating?: number | null
+          review_count?: number | null
+          service_charge?: number
+          working_days?: string
+          working_hours?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_details_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          agent_id: string
+          booking_date: string
+          created_at: string
+          customer_id: string
+          id: string
+          payment_status: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          booking_date: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          payment_status: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          booking_date?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          payment_status?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          about_me: string | null
+          created_at: string
+          district: string
+          full_name: string
+          id: string
+          role: string
+          state: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          about_me?: string | null
+          created_at?: string
+          district: string
+          full_name: string
+          id: string
+          role: string
+          state: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          about_me?: string | null
+          created_at?: string
+          district?: string
+          full_name?: string
+          id?: string
+          role?: string
+          state?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
