@@ -17,9 +17,11 @@ export interface AgentDetails {
   working_hours: 'nine-to-five' | 'flexible';
   working_days: 'weekdays' | 'weekends' | 'full-week';
   service_charge: number;
-  rating: number;
-  review_count: number;
+  rating: number | null;
+  review_count: number | null;
 }
+
+export interface Agent extends Profile, AgentDetails {}
 
 export interface Booking {
   id: string;

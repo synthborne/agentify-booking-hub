@@ -4,14 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AgentCard from "@/components/agents/AgentCard";
 import Navbar from "@/components/shared/Navbar";
-import { Profile, AgentDetails } from "@/lib/types";
-
-interface AgentWithDetails extends Profile, AgentDetails {}
+import { Agent } from "@/lib/types";
 
 const CustomerDashboard = () => {
   const session = useSession();
   const navigate = useNavigate();
-  const [agents, setAgents] = useState<AgentWithDetails[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
 
   useEffect(() => {
     if (!session) {
@@ -42,7 +40,7 @@ const CustomerDashboard = () => {
       const combinedAgents = profiles.map(profile => ({
         ...profile,
         ...agentDetails.find(details => details.id === profile.id)
-      }));
+      })) as Agent[];
 
       setAgents(combinedAgents);
     };

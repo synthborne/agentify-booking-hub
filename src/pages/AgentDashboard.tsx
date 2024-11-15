@@ -35,7 +35,7 @@ const AgentDashboard = () => {
         return;
       }
 
-      setBookings(data);
+      setBookings(data as BookingWithCustomer[]);
     };
 
     fetchBookings();

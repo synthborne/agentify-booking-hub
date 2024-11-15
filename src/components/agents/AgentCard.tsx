@@ -11,28 +11,28 @@ const AgentCard = ({ agent, onBookNow }: AgentCardProps) => {
     <div className="glass-card rounded-xl p-6 animate-scale-in">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-xl font-semibold text-primary">{agent.fullName}</h3>
+          <h3 className="text-xl font-semibold text-primary">{agent.full_name}</h3>
           <p className="text-sm text-muted-foreground">
-            {agent.region}, {agent.district}
+            {agent.state}, {agent.district}
           </p>
         </div>
         <div className="flex items-center">
           <Star className="w-4 h-4 text-accent fill-accent" />
-          <span className="ml-1 text-sm font-medium">{agent.rating}</span>
+          <span className="ml-1 text-sm font-medium">{agent.rating ?? 5.0}</span>
           <span className="ml-1 text-xs text-muted-foreground">
-            ({agent.reviewCount})
+            ({agent.review_count ?? 0})
           </span>
         </div>
       </div>
       
-      <p className="text-sm text-gray-600 mb-4 line-clamp-3">{agent.aboutMe}</p>
+      <p className="text-sm text-gray-600 mb-4 line-clamp-3">{agent.about_me}</p>
       
       <div className="flex flex-wrap gap-2 mb-4">
         <span className="px-3 py-1 text-xs rounded-full bg-secondary text-primary">
-          {agent.workingHours === 'nine-to-five' ? '9 to 5' : 'Flexible Hours'}
+          {agent.working_hours === 'nine-to-five' ? '9 to 5' : 'Flexible Hours'}
         </span>
         <span className="px-3 py-1 text-xs rounded-full bg-secondary text-primary">
-          {agent.workingDays.replace('-', ' ')}
+          {agent.working_days.replace('-', ' ')}
         </span>
       </div>
       
@@ -40,7 +40,7 @@ const AgentCard = ({ agent, onBookNow }: AgentCardProps) => {
         <div>
           <p className="text-sm text-muted-foreground">Starting from</p>
           <p className="text-lg font-semibold text-primary">
-            {agent.charges} ETH
+            {agent.service_charge} ETH
           </p>
         </div>
         <button
