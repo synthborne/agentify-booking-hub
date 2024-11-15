@@ -1,12 +1,18 @@
 import { Agent } from "@/lib/types";
 import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface AgentCardProps {
   agent: Agent;
-  onBookNow: (agentId: string) => void;
 }
 
-const AgentCard = ({ agent, onBookNow }: AgentCardProps) => {
+const AgentCard = ({ agent }: AgentCardProps) => {
+  const navigate = useNavigate();
+
+  const handleBookNow = () => {
+    navigate(`/booking/${agent.id}`);
+  };
+
   return (
     <div className="glass-card rounded-xl p-6 animate-scale-in">
       <div className="flex items-start justify-between mb-4">
@@ -44,7 +50,7 @@ const AgentCard = ({ agent, onBookNow }: AgentCardProps) => {
           </p>
         </div>
         <button
-          onClick={() => onBookNow(agent.id)}
+          onClick={handleBookNow}
           className="px-6 py-2 bg-accent text-white rounded-lg button-hover"
         >
           Book Now
