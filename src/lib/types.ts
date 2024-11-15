@@ -1,34 +1,47 @@
 export type UserRole = 'customer' | 'agent';
 
-export interface User {
+export interface Profile {
   id: string;
-  email: string;
-  fullName: string;
   role: UserRole;
-  region: string;
+  full_name: string;
+  state: string;
   district: string;
-  walletId: string;
+  about_me?: string;
+  wallet_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface Agent extends User {
-  charges: number;
-  aboutMe: string;
-  workingHours: 'nine-to-five' | 'flexible';
-  workingDays: 'weekdays' | 'weekends' | 'full-week';
+export interface AgentDetails {
+  id: string;
+  working_hours: 'nine-to-five' | 'flexible';
+  working_days: 'weekdays' | 'weekends' | 'full-week';
+  service_charge: number;
   rating: number;
-  reviewCount: number;
+  review_count: number;
+}
+
+export interface Booking {
+  id: string;
+  customer_id: string;
+  agent_id: string;
+  booking_date: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  payment_status: 'pending' | 'paid' | 'refunded';
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthFormData {
   email: string;
   password: string;
-  fullName?: string;
-  region?: string;
-  district?: string;
-  walletId?: string;
   role?: UserRole;
-  charges?: number;
-  aboutMe?: string;
-  workingHours?: 'nine-to-five' | 'flexible';
-  workingDays?: 'weekdays' | 'weekends' | 'full-week';
+  full_name?: string;
+  state?: string;
+  district?: string;
+  wallet_id?: string;
+  working_hours?: 'nine-to-five' | 'flexible';
+  working_days?: 'weekdays' | 'weekends' | 'full-week';
+  service_charge?: number;
+  about_me?: string;
 }

@@ -1,138 +1,153 @@
 import { useState } from "react";
 import { AuthFormData, UserRole } from "@/lib/types";
-import { useSearchParams } from "react-router-dom";
 
-const AuthForm = () => {
-  const [searchParams] = useSearchParams();
-  const isSignUp = searchParams.get("mode") === "signup";
-  const [role, setRole] = useState<UserRole>("customer");
-  
+interface AuthFormProps {
+  isSignUp: boolean;
+  role: UserRole;
+  onSubmit: (data: AuthFormData) => void;
+}
+
+const AuthForm = ({ isSignUp, role, onSubmit }: AuthFormProps) => {
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
     password: "",
-    fullName: "",
-    region: "",
+    full_name: "",
+    state: "",
     district: "",
-    walletId: "",
-    charges: 0.001,
-    aboutMe: "",
-    workingHours: "nine-to-five",
-    workingDays: "weekdays",
+    wallet_id: "",
+    service_charge: 0.001,
+    about_me: "",
+    working_hours: "nine-to-five",
+    working_days: "weekdays",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle authentication logic here
-    console.log(formData);
+    onSubmit(formData);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+        required
+      />
+      
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={formData.password}
+        onChange={handleChange}
+        className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+        required
+      />
+      
       {isSignUp && (
-        <div className="flex gap-4 mb-6">
-          <button
-            type="button"
-            onClick={() => setRole("customer")}
-            className={`flex-1 py-3 px-4 rounded-lg text-center transition-all duration-200 ${
-              role === "customer"
-                ? "bg-accent text-white"
-                : "bg-secondary text-primary"
-            }`}
-          >
-            Customer
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole("agent")}
-            className={`flex-1 py-3 px-4 rounded-lg text-center transition-all duration-200 ${
-              role === "agent"
-                ? "bg-accent text-white"
-                : "bg-secondary text-primary"
-            }`}
-          >
-            Agent
-          </button>
-        </div>
+        <>
+          <input
+            type="text"
+            name="full_name"
+            placeholder="Full Name"
+            value={formData.full_name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+            required
+          />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="state"
+              placeholder="State"
+              value={formData.state}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+              required
+            />
+            <input
+              type="text"
+              name="district"
+              placeholder="District"
+              value={formData.district}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+              required
+            />
+          </div>
+          
+          <input
+            type="text"
+            name="wallet_id"
+            placeholder="MetaMask Wallet ID"
+            value={formData.wallet_id}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+            required
+          />
+          
+          {role === "agent" && (
+            <>
+              <input
+                type="number"
+                name="service_charge"
+                step="0.001"
+                min="0.001"
+                placeholder="Service Charge (ETH)"
+                value={formData.service_charge}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+                required
+              />
+              
+              <textarea
+                name="about_me"
+                placeholder="About Me"
+                value={formData.about_me}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+                required
+              />
+              
+              <select
+                name="working_hours"
+                value={formData.working_hours}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+                required
+              >
+                <option value="nine-to-five">9 to 5</option>
+                <option value="flexible">Flexible Hours</option>
+              </select>
+              
+              <select
+                name="working_days"
+                value={formData.working_days}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+                required
+              >
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+                <option value="full-week">Full Week</option>
+              </select>
+            </>
+          )}
+        </>
       )}
-
-      <div className="space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-          required
-        />
-        
-        {isSignUp && (
-          <>
-            <input
-              type="text"
-              placeholder="Full Name"
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-              required
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Region"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-                required
-              />
-              <input
-                type="text"
-                placeholder="District"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-                required
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="MetaMask Wallet ID"
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-              required
-            />
-            
-            {role === "agent" && (
-              <>
-                <input
-                  type="number"
-                  step="0.001"
-                  min="0.001"
-                  placeholder="Charges (ETH)"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-                  required
-                />
-                <textarea
-                  placeholder="About Me"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-                  required
-                />
-                <select
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-                  required
-                >
-                  <option value="nine-to-five">9 to 5</option>
-                  <option value="flexible">Flexible Hours</option>
-                </select>
-                <select
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
-                  required
-                >
-                  <option value="weekdays">Weekdays</option>
-                  <option value="weekends">Weekends</option>
-                  <option value="full-week">Full Week</option>
-                </select>
-              </>
-            )}
-          </>
-        )}
-      </div>
 
       <button
         type="submit"
