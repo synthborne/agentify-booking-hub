@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { AuthFormData, UserRole } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 interface AuthFormProps {
   isSignUp: boolean;
@@ -15,14 +17,38 @@ const AuthForm = ({ isSignUp, role, onSubmit }: AuthFormProps) => {
     state: "",
     district: "",
     wallet_id: "",
+    mobile_number: "",
     service_charge: 0.001,
     about_me: "",
     working_hours: "nine-to-five",
     working_days: "weekdays",
   });
 
+  const validateWalletId = (walletId: string) => {
+    // Basic Ethereum address validation
+    return /^0x[a-fA-F0-9]{40}$/.test(walletId);
+  };
+
+  const validateMobileNumber = (number: string) => {
+    // Basic mobile number validation (10 digits)
+    return /^\d{10}$/.test(number);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSignUp) {
+      if (!validateWalletId(formData.wallet_id || "")) {
+        toast.error("Please enter a valid wallet ID");
+        return;
+      }
+
+      if (!validateMobileNumber(formData.mobile_number || "")) {
+        toast.error("Please enter a valid 10-digit mobile number");
+        return;
+      }
+    }
+
     onSubmit(formData);
   };
 
@@ -36,72 +62,75 @@ const AuthForm = ({ isSignUp, role, onSubmit }: AuthFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input
+      <Input
         type="email"
         name="email"
         placeholder="Email"
         value={formData.email}
         onChange={handleChange}
-        className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
         required
       />
       
-      <input
+      <Input
         type="password"
         name="password"
         placeholder="Password"
         value={formData.password}
         onChange={handleChange}
-        className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
         required
       />
       
       {isSignUp && (
         <>
-          <input
+          <Input
             type="text"
             name="full_name"
             placeholder="Full Name"
             value={formData.full_name}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
+            required
+          />
+          
+          <Input
+            type="text"
+            name="mobile_number"
+            placeholder="Mobile Number (10 digits)"
+            value={formData.mobile_number}
+            onChange={handleChange}
             required
           />
           
           <div className="grid grid-cols-2 gap-4">
-            <input
+            <Input
               type="text"
               name="state"
               placeholder="State"
               value={formData.state}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
               required
             />
-            <input
+            <Input
               type="text"
               name="district"
               placeholder="District"
               value={formData.district}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
               required
             />
           </div>
           
-          <input
+          <Input
             type="text"
             name="wallet_id"
-            placeholder="MetaMask Wallet ID"
+            placeholder="MetaMask Wallet ID (0x...)"
             value={formData.wallet_id}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
             required
           />
           
           {role === "agent" && (
             <>
-              <input
+              <Input
                 type="number"
                 name="service_charge"
                 step="0.001"
@@ -109,7 +138,6 @@ const AuthForm = ({ isSignUp, role, onSubmit }: AuthFormProps) => {
                 placeholder="Service Charge (ETH)"
                 value={formData.service_charge}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 input-focus"
                 required
               />
               

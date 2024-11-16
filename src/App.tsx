@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import AgentDashboard from "./pages/AgentDashboard";
 import BookingPage from "./pages/BookingPage";
+import ProfilePage from "./pages/ProfilePage";
 import { supabase } from "./integrations/supabase/client";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/customer-dashboard" element={<CustomerDashboard />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
             <Route path="/booking/:agentId" element={<BookingPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

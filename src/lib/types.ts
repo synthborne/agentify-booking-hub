@@ -8,6 +8,7 @@ export interface Profile {
   district: string;
   about_me?: string;
   wallet_id: string;
+  mobile_number: string;
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +43,7 @@ export interface AuthFormData {
   state?: string;
   district?: string;
   wallet_id?: string;
+  mobile_number?: string;
   working_hours?: 'nine-to-five' | 'flexible';
   working_days?: 'weekdays' | 'weekends' | 'full-week';
   service_charge?: number;
