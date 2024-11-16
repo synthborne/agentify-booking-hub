@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSession } from "@supabase/auth-helpers-react";
 import { Agent } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import BookingActions from "@/components/booking/BookingActions";
 
 const BookingPage = () => {
   const { agentId } = useParams();
   const session = useSession();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<Agent | null>(null);
-  const [bookingStatus, setBookingStatus] = useState<"initial" | "pending" | "confirmed" | "cancelled">("initial");
-  const [isLoading, setIsLoading] = useState(false);
+  const [bookingId, setBookingId] = useState<string | null>(null);
+  const [bookingStatus, setBookingStatus] = useState<string>("initial");
 
   useEffect(() => {
     if (!session) {
@@ -44,7 +44,6 @@ const BookingPage = () => {
         return;
       }
 
-      // Ensure working_hours is properly typed
       const workingHours = agentDetails.working_hours === 'nine-to-five' ? 'nine-to-five' as const : 'flexible' as const;
       
       setAgent({
@@ -53,98 +52,36 @@ const BookingPage = () => {
         working_hours: workingHours,
         role: 'agent' as const
       } as Agent);
+
+      // Create initial booking record
+      const { data: booking, error: bookingError } = await supabase
+        .from("bookings")
+        .insert({
+          agent_id: agentId,
+          customer_id: session.user.id,
+          booking_date: new Date().toISOString(),
+          status: "initial",
+          payment_status: "pending"
+        })
+        .select()
+        .single();
+
+      if (bookingError) {
+        toast.error("Error creating booking");
+        return;
+      }
+
+      setBookingId(booking.id);
     };
 
     fetchAgent();
   }, [agentId, session, navigate]);
 
-  const handleConfirmBooking = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.from("bookings").insert({
-        agent_id: agentId,
-        customer_id: session?.user.id,
-        booking_date: new Date().toISOString(),
-        status: "pending",
-        payment_status: "pending"
-      });
-
-      if (error) throw error;
-
-      setBookingStatus("pending");
-      toast.success("Booking initiated successfully!");
-
-      // Call the edge function to send email notifications
-      const { error: emailError } = await supabase.functions.invoke('send-booking-email', {
-        body: { agentId, customerId: session?.user.id, status: 'pending' }
-      });
-
-      if (emailError) {
-        console.error('Error sending email:', emailError);
-      }
-
-    } catch (error) {
-      toast.error("Failed to create booking");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleStatusChange = (newStatus: string) => {
+    setBookingStatus(newStatus);
   };
 
-  const handleConfirmDeal = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from("bookings")
-        .update({ status: "confirmed" })
-        .eq("agent_id", agentId)
-        .eq("customer_id", session?.user.id)
-        .eq("status", "pending");
-
-      if (error) throw error;
-
-      setBookingStatus("confirmed");
-      toast.success("Deal confirmed successfully!");
-
-      // Send confirmation emails
-      const { error: emailError } = await supabase.functions.invoke('send-booking-email', {
-        body: { agentId, customerId: session?.user.id, status: 'confirmed' }
-      });
-
-      if (emailError) {
-        console.error('Error sending email:', emailError);
-      }
-
-    } catch (error) {
-      toast.error("Failed to confirm deal");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancelBooking = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("agent_id", agentId)
-        .eq("customer_id", session?.user.id)
-        .eq("status", "pending");
-
-      if (error) throw error;
-
-      setBookingStatus("cancelled");
-      toast.success("Booking cancelled successfully!");
-      navigate("/customer-dashboard");
-
-    } catch (error) {
-      toast.error("Failed to cancel booking");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!agent) return <div>Loading...</div>;
+  if (!agent || !bookingId) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -187,45 +124,14 @@ const BookingPage = () => {
               <p className="text-2xl font-bold text-primary">{agent.service_charge} ETH</p>
             </div>
 
-            {bookingStatus === "initial" && (
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleConfirmBooking}
-                disabled={isLoading}
-              >
-                {isLoading ? "Processing..." : "Confirm Booking"}
-              </Button>
-            )}
-
-            {bookingStatus === "pending" && (
-              <div className="space-y-4">
-                <div className="p-4 bg-secondary rounded-lg">
-                  <h3 className="font-semibold mb-2">Agent Contact</h3>
-                  <p className="text-muted-foreground">Email: agent@example.com</p>
-                </div>
-                <div className="flex gap-4">
-                  <Button
-                    className="flex-1"
-                    variant="default"
-                    size="lg"
-                    onClick={handleConfirmDeal}
-                    disabled={isLoading}
-                  >
-                    Confirm Deal
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    variant="destructive"
-                    size="lg"
-                    onClick={handleCancelBooking}
-                    disabled={isLoading}
-                  >
-                    Cancel Booking
-                  </Button>
-                </div>
-              </div>
-            )}
+            <BookingActions
+              bookingId={bookingId}
+              customerId={session.user.id}
+              agentId={agent.id}
+              serviceCharge={agent.service_charge}
+              bookingStatus={bookingStatus}
+              onStatusChange={handleStatusChange}
+            />
           </div>
         </div>
       </div>

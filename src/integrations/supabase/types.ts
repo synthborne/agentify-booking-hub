@@ -92,6 +92,64 @@ export type Database = {
           },
         ]
       }
+      escrow_transactions: {
+        Row: {
+          amount: number
+          booking_id: string
+          created_at: string
+          from_wallet_id: string
+          id: string
+          status: string
+          to_wallet_id: string
+          transaction_type: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          booking_id: string
+          created_at?: string
+          from_wallet_id: string
+          id?: string
+          status?: string
+          to_wallet_id: string
+          transaction_type: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          created_at?: string
+          from_wallet_id?: string
+          id?: string
+          status?: string
+          to_wallet_id?: string
+          transaction_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escrow_transactions_from_wallet_id_fkey"
+            columns: ["from_wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["wallet_id"]
+          },
+          {
+            foreignKeyName: "escrow_transactions_to_wallet_id_fkey"
+            columns: ["to_wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["wallet_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           about_me: string | null
@@ -131,12 +189,40 @@ export type Database = {
         }
         Relationships: []
       }
+      wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      process_wallet_transfer: {
+        Args: {
+          from_wallet: string
+          to_wallet: string
+          transfer_amount: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
