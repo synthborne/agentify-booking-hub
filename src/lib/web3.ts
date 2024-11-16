@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { InjectedConnector } from '@web3-react/injected-connector';
+import { ethers } from 'ethers';
 
 declare global {
   interface Window {
@@ -27,7 +28,7 @@ export const getWeb3 = async (): Promise<Web3Provider> => {
 export const sendEther = async (from: string, to: string, amount: number) => {
   const provider = await getWeb3();
   const signer = provider.getSigner();
-  const amountInWei = provider.utils.parseEther(amount.toString());
+  const amountInWei = ethers.utils.parseEther(amount.toString());
 
   try {
     const tx = await signer.sendTransaction({
