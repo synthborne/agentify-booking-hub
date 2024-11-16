@@ -2,10 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { Web3ReactProvider } from '@web3-react/core';
-import { Web3Provider } from '@ethersproject/providers';
+import { providers } from 'ethers';
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -16,8 +16,10 @@ import { supabase } from "./integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
-function getLibrary(provider: any) {
-  return new Web3Provider(provider);
+function getLibrary(provider: any): providers.Web3Provider {
+  const library = new providers.Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
 }
 
 const App = () => (
