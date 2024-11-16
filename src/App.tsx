@@ -16,11 +16,9 @@ import { supabase } from "./integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
-function getLibrary(provider: any): Web3Provider {
-  const library = new Web3Provider(provider);
-  library.pollingInterval = 12000;
-  return library;
-}
+const getLibrary = (provider: any) => {
+  return new Web3Provider(provider);
+};
 
 const App = () => (
   <Web3ReactProvider getLibrary={getLibrary}>

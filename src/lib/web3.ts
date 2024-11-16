@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import { Web3Provider } from '@ethersproject/providers';
 import { InjectedConnector } from '@web3-react/injected-connector';
 
 declare global {
@@ -8,15 +8,14 @@ declare global {
 }
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [1, 3, 4, 5, 42] // Mainnet, Ropsten, Rinkeby, Goerli, Kovan
+  supportedChainIds: [1, 3, 4, 5, 42]
 });
 
-export const getWeb3 = async () => {
+export const getWeb3 = async (): Promise<Web3Provider> => {
   if (typeof window.ethereum !== 'undefined') {
     try {
-      // Request account access
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-      return new Web3(window.ethereum);
+      return new Web3Provider(window.ethereum);
     } catch (error) {
       throw new Error('Please allow MetaMask access');
     }
@@ -26,16 +25,16 @@ export const getWeb3 = async () => {
 };
 
 export const sendEther = async (from: string, to: string, amount: number) => {
-  const web3 = await getWeb3();
-  const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
+  const provider = await getWeb3();
+  const signer = provider.getSigner();
+  const amountInWei = provider.utils.parseEther(amount.toString());
 
   try {
-    const transaction = await web3.eth.sendTransaction({
-      from,
+    const tx = await signer.sendTransaction({
       to,
       value: amountInWei
     });
-    return transaction;
+    return tx;
   } catch (error) {
     throw new Error('Transaction failed');
   }
