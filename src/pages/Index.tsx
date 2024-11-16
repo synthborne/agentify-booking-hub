@@ -12,6 +12,7 @@ const mockAgents: Agent[] = [
     state: "New York",
     district: "Manhattan",
     wallet_id: "0x123...",
+    mobile_number: "1234567890", // Added missing field
     service_charge: 0.05,
     about_me: "Experienced real estate agent specializing in luxury properties with over 10 years of experience in Manhattan's high-end market.",
     working_hours: "nine-to-five",
@@ -28,6 +29,7 @@ const mockAgents: Agent[] = [
     state: "New York",
     district: "Brooklyn",
     wallet_id: "0x456...",
+    mobile_number: "9876543210", // Added missing field
     service_charge: 0.03,
     about_me: "Brooklyn native with deep knowledge of emerging neighborhoods and investment opportunities. Passionate about helping first-time homebuyers.",
     working_hours: "flexible",

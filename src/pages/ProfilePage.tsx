@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Profile } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Profile, UserRole } from "@/lib/types";
 
 const ProfilePage = () => {
   const session = useSession();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState<Profile>({} as Profile);
   const [formData, setFormData] = useState<Partial<Profile>>({});
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!session) {
@@ -32,8 +32,14 @@ const ProfilePage = () => {
         return;
       }
 
-      setProfile(data);
-      setFormData(data);
+      // Explicitly type the role as UserRole
+      const profileWithTypedRole = {
+        ...data,
+        role: data.role as UserRole
+      };
+
+      setProfile(profileWithTypedRole);
+      setFormData(profileWithTypedRole);
     };
 
     fetchProfile();
@@ -57,7 +63,7 @@ const ProfilePage = () => {
       return;
     }
 
-    setProfile(formData as Profile);
+    setProfile({ ...profile, ...formData });
     setIsEditing(false);
     toast.success("Profile updated successfully");
   };
