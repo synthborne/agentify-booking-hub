@@ -22,15 +22,14 @@ const AuthForm = ({ isSignUp, role, onSubmit }: AuthFormProps) => {
     about_me: "",
     working_hours: "nine-to-five",
     working_days: "weekdays",
+    role: role, // Add role to formData
   });
 
   const validateWalletId = (walletId: string) => {
-    // Basic Ethereum address validation
     return /^0x[a-fA-F0-9]{40}$/.test(walletId);
   };
 
   const validateMobileNumber = (number: string) => {
-    // Basic mobile number validation (10 digits)
     return /^\d{10}$/.test(number);
   };
 

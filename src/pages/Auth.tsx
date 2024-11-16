@@ -24,6 +24,7 @@ const Auth = () => {
               state: formData.state,
               district: formData.district,
               wallet_id: formData.wallet_id,
+              mobile_number: formData.mobile_number, // Make sure mobile_number is included
               working_hours: formData.working_hours,
               working_days: formData.working_days,
               service_charge: formData.service_charge,
