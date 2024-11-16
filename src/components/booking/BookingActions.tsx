@@ -52,7 +52,7 @@ const BookingActions = ({
     }
   };
 
-  if (bookingStatus === "initial") {
+  if (bookingStatus === "pending") {
     return (
       <Button
         className="w-full"

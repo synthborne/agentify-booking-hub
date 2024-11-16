@@ -13,7 +13,7 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
-  const [bookingStatus, setBookingStatus] = useState<string>("initial");
+  const [bookingStatus, setBookingStatus] = useState<string>("pending");
 
   useEffect(() => {
     if (!session) {
@@ -53,14 +53,14 @@ const BookingPage = () => {
         role: 'agent' as const
       } as Agent);
 
-      // Create initial booking record
+      // Create initial booking record with correct status
       const { data: booking, error: bookingError } = await supabase
         .from("bookings")
         .insert({
           agent_id: agentId,
           customer_id: session.user.id,
           booking_date: new Date().toISOString(),
-          status: "initial",
+          status: "pending",
           payment_status: "pending"
         })
         .select()
@@ -68,6 +68,7 @@ const BookingPage = () => {
 
       if (bookingError) {
         toast.error("Error creating booking");
+        console.error("Booking error:", bookingError);
         return;
       }
 
