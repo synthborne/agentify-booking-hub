@@ -25,9 +25,24 @@ export const sendEther = async (from: string, to: string, amount: number) => {
     const signer = provider.getSigner();
     const amountInWei = ethers.utils.parseEther(amount.toString());
 
-    const tx = await signer.sendTransaction({
+    // Estimate gas for the transaction
+    const gasEstimate = await provider.estimateGas({
       to,
       value: amountInWei
+    });
+
+    // Get current gas price
+    const gasPrice = await provider.getGasPrice();
+    const maxGasPrice = ethers.utils.parseUnits(MAX_GAS_PRICE, "gwei");
+    
+    // Use the lower of current gas price or max gas price
+    const finalGasPrice = gasPrice.gt(maxGasPrice) ? maxGasPrice : gasPrice;
+
+    const tx = await signer.sendTransaction({
+      to,
+      value: amountInWei,
+      gasLimit: gasEstimate,
+      gasPrice: finalGasPrice
     });
     
     return tx;

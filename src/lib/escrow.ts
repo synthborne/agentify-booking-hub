@@ -1,6 +1,45 @@
 import { supabase } from "@/integrations/supabase/client";
 import { sendEther } from "./web3";
-import { toast } from "sonner";
+import { ESCROW_WALLET_ID } from "@/config/constants";
+
+const handleEscrowTransaction = async (
+  bookingId: string,
+  fromWalletId: string,
+  toWalletId: string,
+  amount: number,
+  transactionType: 'escrow_lock' | 'escrow_release' | 'escrow_refund'
+) => {
+  try {
+    await sendEther(fromWalletId, toWalletId, amount);
+
+    const { error: transactionError } = await supabase
+      .from('escrow_transactions')
+      .insert({
+        booking_id: bookingId,
+        from_wallet_id: fromWalletId,
+        to_wallet_id: toWalletId,
+        amount,
+        transaction_type: transactionType,
+        status: 'completed'
+      });
+
+    if (transactionError) throw transactionError;
+
+    const newStatus = 
+      transactionType === 'escrow_lock' ? 'in_escrow' :
+      transactionType === 'escrow_release' ? 'completed' : 'cancelled';
+
+    const { error: bookingError } = await supabase
+      .from('bookings')
+      .update({ status: newStatus })
+      .eq('id', bookingId);
+
+    if (bookingError) throw bookingError;
+  } catch (error) {
+    console.error('Transaction error:', error);
+    throw error;
+  }
+};
 
 export async function initiateEscrow(
   bookingId: string, 
@@ -18,39 +57,13 @@ export async function initiateEscrow(
     throw new Error('Customer wallet not found');
   }
 
-  try {
-    // Send Ether to escrow wallet
-    await sendEther(
-      customerData.wallet_id,
-      'escrow_wallet', // This should be your escrow contract address in production
-      amount
-    );
-
-    // Create escrow transaction record
-    const { error: transactionError } = await supabase
-      .from('escrow_transactions')
-      .insert({
-        booking_id: bookingId,
-        from_wallet_id: customerData.wallet_id,
-        to_wallet_id: 'escrow_wallet',
-        amount,
-        transaction_type: 'escrow_lock',
-        status: 'completed'
-      });
-
-    if (transactionError) throw transactionError;
-
-    // Update booking status
-    const { error: bookingError } = await supabase
-      .from('bookings')
-      .update({ status: 'in_escrow' })
-      .eq('id', bookingId);
-
-    if (bookingError) throw bookingError;
-  } catch (error) {
-    console.error('Escrow error:', error);
-    throw error;
-  }
+  return handleEscrowTransaction(
+    bookingId,
+    customerData.wallet_id,
+    ESCROW_WALLET_ID,
+    amount,
+    'escrow_lock'
+  );
 }
 
 export async function releaseEscrow(
@@ -68,39 +81,13 @@ export async function releaseEscrow(
     throw new Error('Agent wallet not found');
   }
 
-  try {
-    // Send Ether from escrow to agent
-    await sendEther(
-      'escrow_wallet', // This should be your escrow contract address in production
-      agentData.wallet_id,
-      amount
-    );
-
-    // Create release transaction record
-    const { error: transactionError } = await supabase
-      .from('escrow_transactions')
-      .insert({
-        booking_id: bookingId,
-        from_wallet_id: 'escrow_wallet',
-        to_wallet_id: agentData.wallet_id,
-        amount,
-        transaction_type: 'escrow_release',
-        status: 'completed'
-      });
-
-    if (transactionError) throw transactionError;
-
-    // Update booking status
-    const { error: bookingError } = await supabase
-      .from('bookings')
-      .update({ status: 'completed' })
-      .eq('id', bookingId);
-
-    if (bookingError) throw bookingError;
-  } catch (error) {
-    console.error('Release error:', error);
-    throw error;
-  }
+  return handleEscrowTransaction(
+    bookingId,
+    ESCROW_WALLET_ID,
+    agentData.wallet_id,
+    amount,
+    'escrow_release'
+  );
 }
 
 export async function refundEscrow(
@@ -118,37 +105,11 @@ export async function refundEscrow(
     throw new Error('Customer wallet not found');
   }
 
-  try {
-    // Send Ether from escrow back to customer
-    await sendEther(
-      'escrow_wallet', // This should be your escrow contract address in production
-      customerData.wallet_id,
-      amount
-    );
-
-    // Create refund transaction record
-    const { error: transactionError } = await supabase
-      .from('escrow_transactions')
-      .insert({
-        booking_id: bookingId,
-        from_wallet_id: 'escrow_wallet',
-        to_wallet_id: customerData.wallet_id,
-        amount,
-        transaction_type: 'escrow_refund',
-        status: 'completed'
-      });
-
-    if (transactionError) throw transactionError;
-
-    // Update booking status
-    const { error: bookingError } = await supabase
-      .from('bookings')
-      .update({ status: 'cancelled' })
-      .eq('id', bookingId);
-
-    if (bookingError) throw bookingError;
-  } catch (error) {
-    console.error('Refund error:', error);
-    throw error;
-  }
+  return handleEscrowTransaction(
+    bookingId,
+    ESCROW_WALLET_ID,
+    customerData.wallet_id,
+    amount,
+    'escrow_refund'
+  );
 }
