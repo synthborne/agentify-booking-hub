@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { MAX_GAS_PRICE } from '@/config/constants';
 
 declare global {
   interface Window {
