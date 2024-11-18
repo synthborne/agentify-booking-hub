@@ -2,6 +2,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { sendEther } from "./web3";
 import { ESCROW_WALLET_ID } from "@/config/constants";
 
+const ensureWalletExists = async (walletId: string) => {
+  const { data } = await supabase
+    .from('wallets')
+    .select('wallet_id')
+    .eq('wallet_id', walletId)
+    .single();
+
+  if (!data) {
+    await supabase
+      .from('wallets')
+      .insert({ wallet_id: walletId });
+  }
+};
+
 const handleEscrowTransaction = async (
   bookingId: string,
   fromWalletId: string,
@@ -10,6 +24,10 @@ const handleEscrowTransaction = async (
   transactionType: 'escrow_lock' | 'escrow_release' | 'escrow_refund'
 ) => {
   try {
+    // Ensure both wallets exist before proceeding
+    await ensureWalletExists(fromWalletId);
+    await ensureWalletExists(toWalletId);
+
     await sendEther(fromWalletId, toWalletId, amount);
 
     const { error: transactionError } = await supabase
