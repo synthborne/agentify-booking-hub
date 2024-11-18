@@ -1,5 +1,5 @@
 // Escrow wallet configuration
-export const ESCROW_WALLET_ID = import.meta.env.VITE_ESCROW_WALLET_ID || "YOUR_ESCROW_WALLET_ID";
+export const ESCROW_WALLET_ID = import.meta.env.VITE_ESCROW_WALLET_ID;
 
 // Gas configuration
 export const GAS_LIMIT = 21000; // Standard gas limit for ETH transfers

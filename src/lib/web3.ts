@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { MAX_GAS_PRICE } from '@/config/constants';
+import { MAX_GAS_PRICE, GAS_LIMIT } from '@/config/constants';
 
 declare global {
   interface Window {
@@ -26,12 +26,6 @@ export const sendEther = async (from: string, to: string, amount: number) => {
     const signer = provider.getSigner();
     const amountInWei = ethers.utils.parseEther(amount.toString());
 
-    // Estimate gas for the transaction
-    const gasEstimate = await provider.estimateGas({
-      to,
-      value: amountInWei
-    });
-
     // Get current gas price
     const gasPrice = await provider.getGasPrice();
     const maxGasPrice = ethers.utils.parseUnits(MAX_GAS_PRICE, "gwei");
@@ -42,7 +36,7 @@ export const sendEther = async (from: string, to: string, amount: number) => {
     const tx = await signer.sendTransaction({
       to,
       value: amountInWei,
-      gasLimit: gasEstimate,
+      gasLimit: GAS_LIMIT,
       gasPrice: finalGasPrice
     });
     
